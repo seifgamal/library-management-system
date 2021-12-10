@@ -36,16 +36,14 @@ public class AuthorController {
 
 	private boolean addAuthorToDB(Author newAuthor) {
 		String query = "insert into Author(fullName, bio, email, birthday) values (?, ?, ?, ?)";
-		try {
-			PreparedStatement queryStatement = databaseManager.getConnectionObject()
-					.prepareStatement(query);
+		try (PreparedStatement queryStatement = databaseManager.getConnectionObject()
+				.prepareStatement(query)) {
 
 			queryStatement.setString(1, newAuthor.getFullName());
 			queryStatement.setString(2, newAuthor.getBio());
 			queryStatement.setDate(3, (Date) newAuthor.getBirthday());
 
 			int updatedRowsCount = queryStatement.executeUpdate();
-			queryStatement.close();
 			return updatedRowsCount == 1;
 		} catch (SQLException e) {
 			logger.error("Failed to add author {} to the database, error={}", newAuthor.toString(),
@@ -71,10 +69,10 @@ public class AuthorController {
 	private List<Author> getAllAuthorsFromDB() {
 		List<Author> authorsFromDB = new ArrayList<>();
 		String query = "select * from Author";
-		try {
-			PreparedStatement queryStatement = databaseManager.getConnectionObject()
-					.prepareStatement(query);
-			ResultSet resultSet = queryStatement.executeQuery();
+		try (PreparedStatement queryStatement = databaseManager.getConnectionObject()
+				.prepareStatement(query);
+				ResultSet resultSet = queryStatement.executeQuery()) {
+
 			while (resultSet.next()) {
 				Author Author = new Author();
 				Author.setId(resultSet.getInt("id"));
@@ -85,8 +83,6 @@ public class AuthorController {
 
 				authorsFromDB.add(Author);
 			}
-			queryStatement.close();
-			resultSet.close();
 		} catch (SQLException e) {
 			logger.error("Failed to get authors from database, error={}", e.getMessage());
 		}
@@ -111,9 +107,8 @@ public class AuthorController {
 		String query =
 				"update Author set fullName = ?, bio = ?, email = ?, " + "birthday = ? where id ="
 						+ updatedAuthor.getId();
-		try {
-			PreparedStatement queryStatement = databaseManager.getConnectionObject()
-					.prepareStatement(query);
+		try (PreparedStatement queryStatement = databaseManager.getConnectionObject()
+				.prepareStatement(query)) {
 
 			queryStatement.setString(1, updatedAuthor.getFullName());
 			queryStatement.setString(2, updatedAuthor.getBio());
@@ -121,7 +116,6 @@ public class AuthorController {
 			queryStatement.setDate(4, (Date) updatedAuthor.getBirthday());
 
 			int updatedRowsCount = queryStatement.executeUpdate();
-			queryStatement.close();
 			return updatedRowsCount == 1;
 		} catch (SQLException e) {
 			logger.error("Failed to update the author in the database, author info={}, error={}",
@@ -147,11 +141,10 @@ public class AuthorController {
 
 	private boolean deleteAuthorByIdFromDB(int authorId) {
 		String query = "delete from Author where id = " + authorId;
-		try {
-			PreparedStatement queryStatement = databaseManager.getConnectionObject()
-					.prepareStatement(query);
+		try (PreparedStatement queryStatement = databaseManager.getConnectionObject()
+				.prepareStatement(query)) {
+
 			int updatedRowsCount = queryStatement.executeUpdate();
-			queryStatement.close();
 			return updatedRowsCount == 1;
 		} catch (SQLException e) {
 			logger.error("Failed to remove book with id={} from database, error={}", authorId,

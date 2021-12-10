@@ -38,9 +38,8 @@ public class BookController {
 
 	private boolean addBookToDB(Book newBook) {
 		String query = "insert into Book(name, description, available, rate, authorId, categoryId) values (?, ?, ?, ?, ?, ?)";
-		try {
-			PreparedStatement queryStatement = databaseManager.getConnectionObject()
-					.prepareStatement(query);
+		try (PreparedStatement queryStatement = databaseManager.getConnectionObject()
+				.prepareStatement(query)) {
 
 			queryStatement.setString(1, newBook.getName());
 			queryStatement.setString(2, newBook.getDescription());
@@ -50,7 +49,6 @@ public class BookController {
 			queryStatement.setInt(6, newBook.getCategoryId());
 
 			int updatedRowsCount = queryStatement.executeUpdate();
-			queryStatement.close();
 			return updatedRowsCount == 1;
 		} catch (SQLException e) {
 			logger.error("Failed to add book {} to the database, error={}", newBook.toString(),
@@ -86,10 +84,10 @@ public class BookController {
 	private List<Book> getAllBooksFromDB() {
 		List<Book> booksFromDB = new ArrayList<>();
 		String query = "select * from Book";
-		try {
-			PreparedStatement queryStatement = databaseManager.getConnectionObject()
-					.prepareStatement(query);
-			ResultSet resultSet = queryStatement.executeQuery();
+		try (PreparedStatement queryStatement = databaseManager.getConnectionObject()
+				.prepareStatement(query);
+				ResultSet resultSet = queryStatement.executeQuery()) {
+
 			while (resultSet.next()) {
 				Book book = new Book();
 				book.setId(resultSet.getInt("id"));
@@ -101,8 +99,6 @@ public class BookController {
 
 				booksFromDB.add(book);
 			}
-			queryStatement.close();
-			resultSet.close();
 		} catch (SQLException e) {
 			logger.error("Failed to get books from database, error={}", e.getMessage());
 		}
@@ -127,9 +123,8 @@ public class BookController {
 		String query =
 				"update Book set name = ?, description = ?, available = ?, " + "rate = ? where id ="
 						+ updatedBook.getId();
-		try {
-			PreparedStatement queryStatement = databaseManager.getConnectionObject()
-					.prepareStatement(query);
+		try (PreparedStatement queryStatement = databaseManager.getConnectionObject()
+				.prepareStatement(query)) {
 
 			queryStatement.setString(1, updatedBook.getName());
 			queryStatement.setString(2, updatedBook.getDescription());
@@ -137,7 +132,6 @@ public class BookController {
 			queryStatement.setDouble(4, updatedBook.getRate());
 
 			int updatedRowsCount = queryStatement.executeUpdate();
-			queryStatement.close();
 			return updatedRowsCount == 1;
 		} catch (SQLException e) {
 			logger.error("Failed to update the book in the database, book info={}, error={}",
@@ -163,11 +157,10 @@ public class BookController {
 
 	private boolean deleteBookByIdFromDB(int bookId) {
 		String query = "delete from Book where id = " + bookId;
-		try {
-			PreparedStatement queryStatement = databaseManager.getConnectionObject()
-					.prepareStatement(query);
+		try (PreparedStatement queryStatement = databaseManager.getConnectionObject()
+				.prepareStatement(query)) {
+
 			int updatedRowsCount = queryStatement.executeUpdate();
-			queryStatement.close();
 			return updatedRowsCount == 1;
 		} catch (SQLException e) {
 			logger.error("Failed to remove book with id={} from database, error={}", bookId,

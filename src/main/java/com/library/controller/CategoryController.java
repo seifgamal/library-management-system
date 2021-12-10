@@ -37,15 +37,13 @@ public class CategoryController {
 
 	private boolean addCategoryToDB(Category newCategory) {
 		String query = "insert into Category(name, description) values (?, ?)";
-		try {
-			PreparedStatement queryStatement = databaseManager.getConnectionObject()
-					.prepareStatement(query);
+		try (PreparedStatement queryStatement = databaseManager.getConnectionObject()
+				.prepareStatement(query)) {
 
 			queryStatement.setString(1, newCategory.getName());
 			queryStatement.setString(2, newCategory.getDescription());
 
 			int updatedRowsCount = queryStatement.executeUpdate();
-			queryStatement.close();
 			return updatedRowsCount == 1;
 		} catch (SQLException e) {
 			logger.error("Failed to add category {} to the database, error={}", newCategory.toString(),
@@ -71,10 +69,10 @@ public class CategoryController {
 	private List<Category> getAllCategoriesFromDB() {
 		List<Category> categoriesFromDB = new ArrayList<>();
 		String query = "select * from Category";
-		try {
-			PreparedStatement queryStatement = databaseManager.getConnectionObject()
-					.prepareStatement(query);
-			ResultSet resultSet = queryStatement.executeQuery();
+		try (PreparedStatement queryStatement = databaseManager.getConnectionObject()
+				.prepareStatement(query);
+				ResultSet resultSet = queryStatement.executeQuery()) {
+
 			while (resultSet.next()) {
 				Category Category = new Category();
 				Category.setId(resultSet.getInt("id"));
@@ -83,8 +81,6 @@ public class CategoryController {
 
 				categoriesFromDB.add(Category);
 			}
-			queryStatement.close();
-			resultSet.close();
 		} catch (SQLException e) {
 			logger.error("Failed to get categories from database, error={}", e.getMessage());
 		}
@@ -108,15 +104,13 @@ public class CategoryController {
 	private boolean updateCategoryInDB(Category updatedCategory) {
 		String query = "update Category set name = ?, description = ? where id ="
 				+ updatedCategory.getId();
-		try {
-			PreparedStatement queryStatement = databaseManager.getConnectionObject()
-					.prepareStatement(query);
+		try (PreparedStatement queryStatement = databaseManager.getConnectionObject()
+				.prepareStatement(query)) {
 
 			queryStatement.setString(1, updatedCategory.getName());
 			queryStatement.setString(2, updatedCategory.getDescription());
 
 			int updatedRowsCount = queryStatement.executeUpdate();
-			queryStatement.close();
 			return updatedRowsCount == 1;
 		} catch (SQLException e) {
 			logger.error("Failed to update the category in the database, category info={} , error={}",
