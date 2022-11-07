@@ -40,4 +40,11 @@ class BookControllerTest {
                         jsonPath("$.id", Matchers.is(bookId))
                 );
     }
+
+    @Test
+    void getBookNotExist() throws Exception {
+        Mockito.when(bookService.getBookById(Mockito.anyInt())).thenReturn(null);
+        this.mockMvc.perform(get("/books/1"))
+                .andExpect(status().isNotFound());
+    }
 }
