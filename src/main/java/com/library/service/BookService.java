@@ -4,6 +4,8 @@ import com.library.model.Book;
 import com.library.repository.BookRepository;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,11 +23,11 @@ public class BookService {
 		return bookRepository.getAll();
 	}
 
-	public List<Book> filterListOfBooksByCategory(List<Book> books, Integer categoryId) {
+	public List<Book> filterListOfBooksByCategory(@NotNull List<Book> books, Integer categoryId) {
 		return books.stream().filter(b -> b.getCategoryId() == categoryId).collect(Collectors.toList());
 	}
 
-	public List<Book> filterListOfBooksByAuthor(List<Book> books, Integer authorId) {
+	public List<Book> filterListOfBooksByAuthor(@NotNull List<Book> books, Integer authorId) {
 		return books.stream().filter(b -> b.getAuthorId() == authorId).collect(Collectors.toList());
 	}
 
