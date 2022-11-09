@@ -29,9 +29,9 @@ class BookControllerTest {
     @Test
     void getBookById() throws Exception {
         String bookName = "New Book";
-        int bookId = 1;
+        Long bookId = 1L;
         Book testBook = new Book(bookId, bookName, "Here's a new book", true, 0, 1, 1);
-        Mockito.when(bookService.getBookById(Mockito.anyInt())).thenReturn(testBook);
+        Mockito.when(bookService.getBookById(Mockito.anyLong())).thenReturn(testBook);
 
         this.mockMvc.perform(get("/books/1"))
                 .andExpectAll(
@@ -39,12 +39,5 @@ class BookControllerTest {
                         jsonPath("$.name", Matchers.is(bookName)),
                         jsonPath("$.id", Matchers.is(bookId))
                 );
-    }
-
-    @Test
-    void getBookNotExist() throws Exception {
-        Mockito.when(bookService.getBookById(Mockito.anyInt())).thenReturn(null);
-        this.mockMvc.perform(get("/books/1"))
-                .andExpect(status().isNotFound());
     }
 }
