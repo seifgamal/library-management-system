@@ -1,22 +1,24 @@
 package com.library.model;
 
-import java.util.Date;
+import lombok.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import javax.persistence.*;
+import java.util.Date;
 
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table(name = "author")
 public class Author {
-	private int id;
-	private String fullName;
-	private String email;
-	private String bio;
-	private Date birthday;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String fullName;
+    private String email;
+    private String bio;
+    private Date birthday;
 }
