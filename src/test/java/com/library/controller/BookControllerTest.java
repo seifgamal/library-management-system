@@ -1,8 +1,8 @@
 package com.library.controller;
 
+import com.library.exception.Book.BookNotFoundException;
 import com.library.model.Book;
 import com.library.service.BookService;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -12,6 +12,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -27,17 +29,26 @@ class BookControllerTest {
     private BookService bookService;
 
     @Test
-    void getBookById() throws Exception {
+    void getBookById_success() throws Exception {
         String bookName = "New Book";
-        Long bookId = 1L;
-        Book testBook = new Book(bookId, bookName, "Here's a new book", true, 0, 1, 1);
+        Book testBook = new Book(null, bookName, "Here's a new book", true, 0, 1, 1);
+
         Mockito.when(bookService.getBookById(Mockito.anyLong())).thenReturn(testBook);
 
         this.mockMvc.perform(get("/books/1"))
                 .andExpectAll(
                         status().isOk(),
-                        jsonPath("$.name", Matchers.is(bookName)),
-                        jsonPath("$.id", Matchers.is(bookId))
+                        jsonPath("$.name").value(bookName),
+                        jsonPath("$.id").value(testBook.getId())
                 );
+    }
+
+    @Test
+    void getBookById_missingBook_status404() throws Exception {
+        given(bookService.getBookById(anyLong())).willThrow(BookNotFoundException.class);
+
+        mockMvc.perform(get("/books/92023"))
+                .andExpect(status().isNotFound());
+
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.transaction.Transactional;
+import java.util.Optional;
 
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
@@ -22,6 +23,18 @@ class BookServiceTest {
 
     @Autowired
     private BookService bookService;
+
+    @Test
+    void addBook_success() {
+        String bName = "Book-RAND";
+        Book newBook = new Book(null, bName, "HERE'S A BOOK", true, 0, 1, 1);
+
+        Book addedBook = bookService.addBook(newBook);
+        then(addedBook.getName()).isEqualTo(newBook.getName());
+
+        Optional<Book> retrievedBook = bookRepository.findById(newBook.getId());
+        then(retrievedBook).isNotNull();
+    }
 
     @Test
     void getBookById_success() throws BookNotFoundException {
